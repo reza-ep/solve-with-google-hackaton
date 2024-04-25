@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>I'm Max!</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Scanner Demo</title>
+    <script src="../node_modules/qr-scanner/qr-scanner.min.js"></script>
+    <style>
+        /* Add any custom styles here */
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-image: url("./images/background.jpeg");
+        }
+
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: rgb(0 0 0 / 50%);
+            width: 100%;
+            height: 100%;
+        }
+
+        #qr-video {
+            width: 100%;
+            max-width: 90vw; /* Set a maximum width for the video box on desktop */
+            max-height: 90vw; /* Limit height to maintain aspect ratio */
+            height: auto; /* Allow height to adjust proportionally */
+            z-index: 99;
+            border-radius: 25px;
+            border: 2px dotted white;
+        }
+
+        #qr-content {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+
+        /* Make the video box square */
+        @media (orientation: portrait) {
+            #qr-video {
+                max-height: calc(100vh - 20px); /* Adjust max-height to prevent overflow */
+            }
+        }
+
+        @media (orientation: landscape) {
+            #qr-video {
+                max-width: calc(100vh - 20px); /* Adjust max-width to prevent overflow */
+            }
+        }
+
+        .container {
+            z-index: 9999;
+            display: flex;
+            flex-direction: inherit;
+            width: 83%;
+        }
+
+        .title {
+            color: white;
+            text-align: center;
+            font-size: 35px;
+            margin-bottom: 56px;
+        }
+    </style>
+    <script>
+        // Initialize the list in local storage with predefined entries
+        if (!localStorage.getItem('items')) {
+            const initialItems = [
+                {
+                    id: 'ea8e75a3-b88a-49a9-bdb6-c0ee8fe3a043',
+                    image: 'https://storage.googleapis.com/solve-with-googl-team-16/image1/output1_2.png',
+                    text: 'The image shows a medical monitoring device, specifically an electrocardiogram (ECG or EKG) machine. This device records the electrical activity of the heart over a period of time using electrodes attached to the skin. The display screen shows a graphical representation of the heart\'s electrical activity, which is essential for diagnosing and monitoring cardiac conditions. There are several leads connected to a small interface box, which then connects to the monitor, displaying the ECG readings in real time.'
+                },
+                {
+                    id: '2414f28b-419e-4a29-ac6c-69e2c33ca6b5',
+                    image: 'https://storage.googleapis.com/solve-with-googl-team-16/image2/output2_0.png',
+                    text: 'The image shows a medical scene where a female healthcare worker is assisting a male patient who is lying on the bed of an MRI (Magnetic Resonance Imaging) machine. The patient appears relaxed and is in conversation with the healthcare worker, who is smiling, likely providing reassurance or explaining the procedure. The MRI machine is large and cylindrical, designed to enclose the patient during the scan to create detailed images of the body\'s internal structures. '
+                },
+                {
+                    id: '454dcf4a-d451-4fcd-a95a-3e829f93c7d5',
+                    image: 'https://storage.googleapis.com/solve-with-googl-team-16/image3/output3_1.png',
+                    text: 'The image depicts a modern healthcare setting featuring a tablet displaying a detailed graphic of a human heart along with charts and data about sickness rates for various diseases. These include cardiovascular diseases, pulmonary disease, diseases of the digestive system, liver disease, diseases of the musculoskeletal system, and neurological diseases. Surrounding the tablet are various medical items including a stethoscope, surgical masks, and eyeglasses, all placed on a desk with a keyboard. The overall scene suggests a medical professional\'s workspace focused'
+                },
+                {
+                    id: '8617dbfc-7943-47fe-b6e2-3456b8f3f449',
+                    image: 'https://storage.googleapis.com/solve-with-googl-team-16/image4/output4_0.png',
+                    text: 'The image shows a medical device called the "VISUALICE Cryoablation System" by Galil Medical. This machine is mounted on a wheeled cart for mobility and features a large monitor on top displaying various control settings and data. Below the monitor, there is a control panel with numerous buttons and dials, presumably for adjusting the device\'s settings and operations. The device is likely used for medical procedures involving cryoablation, a process where extreme cold is used to destroy abnormal tissues.'
+                },
+                {
+                    id: '5ba6190f-8b41-4ef1-a08b-7ba5bcab3719',
+                    image: 'https://storage.googleapis.com/solve-with-googl-team-16/image5/output5_0.png',
+                    text: 'The image shows a portable ultrasound machine displayed on a table. The machine features a screen displaying an ultrasound image with various measurements and settings visible. It has a keyboard with numerous buttons and controls for operating the device, and two ultrasound probes connected to the machine. The setting appears to be a clinical environment, suggested by the simplicity and functionality of the setup. This type of equipment is typically used in medical settings for diagnostic imaging to examine internal body structures.'
+                },
+                {
+                    id: '119f0d23-8856-45ec-a6d0-e64a1e678d5f',
+                    image: 'https://storage.googleapis.com/solve-with-googl-team-16/image6/output6_1.png',
+                    text: 'The image shows a modern anesthesia machine with an integrated monitoring display. The monitor displays various vital signs and ventilator settings, crucial for monitoring a patient\'s status during surgery. The machine also features compartments and controls for administering and regulating anesthetic gases, visible with labels like "Sevoflurane" and "Isoflurane," which are types of inhalation anesthetics. The setup is typically found in an operating room, where it is used to ensure the patient remains unconscious and stable during procedures.'
+                },
+            ];
+
+            localStorage.setItem('items', JSON.stringify(initialItems));
+        }
+
+        function getIDFromURL() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('id');
+        }
+
+        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+        const id = getIDFromURL();
+        if (id && uuidRegex.test(id)) {
+            console.log('ID:', id);
+            // Retrieve existing IDs from local storage
+            let storedIDs = JSON.parse(localStorage.getItem('ids')) || [];
+
+            // Check if ID is present in the list of stored IDs
+            if (!storedIDs.includes(id)) {
+                storedIDs.push(id);
+                localStorage.setItem('ids', JSON.stringify(storedIDs));
+            }
+
+            if (storedIDs.size >= 3) {
+
+            }
+            // ID exists in URL, redirect to explanation page
+            window.location.href = `explanation.html?id=${id}`;
+        }
+    </script>
+</head>
+<body>
+<div class="container">
+    <div class="title">Look around and learn about your surroundings</div>
+    <video id="qr-video" playsinline autoplay></video>
+</div>
+
+<div class="overlay"></div>
+<script src="./app.js" type="module"></script>
+</body>
+</html>

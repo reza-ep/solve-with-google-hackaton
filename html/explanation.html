@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <Title>Max is helping you!</Title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explanation Page</title>
+    <style>
+        /* Add any custom styles here */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        #text-container {
+            margin-top: 20px;
+        }
+
+        /* Modal CSS */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 10% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 600px;
+            text-align: center;
+            position: relative;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+    </style>
+</head>
+<body>
+
+<div id="image-container"></div>
+<div id="text-container"></div>
+<a href="./index.html">Scan other items.</a>
+
+<!-- Modal HTML -->
+<div id="badgeModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Badge Earned!</h2>
+        <img id="badgeImage" src="" alt="Badge Image">
+        <p id="badgeText">Congratulations! You've earned a badge!</p>
+    </div>
+</div>
+
+<script>
+    // Function to retrieve the ID from the URL query parameter
+    function getIDFromURL() {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get('id');
+    }
+
+    // Function to retrieve metadata (image URL and text) from local storage based on the ID
+    function getMetadataByID(id) {
+        const items = JSON.parse(localStorage.getItem('items')) || [];
+        return items.find(item => item.id === id);
+    }
+
+    // Retrieve the ID from the URL
+    const id = getIDFromURL();
+
+    if (id !== null) {
+        // Retrieve metadata (image URL and text) based on the ID
+        const metadata = getMetadataByID(id);
+
+        if (metadata) {
+            // Display the image
+            const imageContainer = document.getElementById('image-container');
+            const image = document.createElement('img');
+            image.src = metadata.image;
+            image.alt = 'Image';
+            imageContainer.appendChild(image);
+
+            // Display the text
+            const textContainer = document.getElementById('text-container');
+            const text = document.createElement('p');
+            text.textContent = metadata.text;
+            textContainer.appendChild(text);
+        } else {
+            console.log('Metadata not found for ID:', id);
+        }
+    } else {
+        console.log('ID not found in URL.');
+        alert('Failed to retrieve the data. Please try again later!');
+    }
+
+    // Retrieve existing IDs from local storage
+    const storedIDs = JSON.parse(localStorage.getItem('ids')) || [];
+
+    // Check if the user has earned the badge
+    if (storedIDs.length === 3 && !localStorage.getItem('badge3Earned')) {
+        // Set the badge flag
+        localStorage.setItem('badge3Earned', 'true');
+
+        // Show the badge modal
+        const modal = document.getElementById('badgeModal');
+        const badgeTextElement = document.getElementById('badgeText');
+        const badgeImageElement = document.getElementById('badgeImage');
+
+        // Update badge text and image
+        badgeTextElement.textContent = 'Congratulations! You\'ve earned a badge!';
+        badgeImageElement.src = 'images/first_badge.png';
+
+        // Show the modal
+        modal.style.display = 'block';
+
+        // Close the modal when the close button is clicked
+        const closeButton = document.getElementsByClassName('close')[0];
+        closeButton.onclick = function () {
+            modal.style.display = 'none';
+        };
+
+        // Close the modal when user clicks outside of it
+        window.onclick = function (event) {
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        };
+    }
+
+    // Check if the user has earned the badge
+    if (storedIDs.length === 6 && !localStorage.getItem('badge6Earned')) {
+        // Set the badge flag
+        localStorage.setItem('badge6Earned', 'true');
+
+        // Show the badge modal
+        const modal = document.getElementById('badgeModal');
+        const badgeTextElement = document.getElementById('badgeText');
+        const badgeImageElement = document.getElementById('badgeImage');
+
+        // Update badge text and image
+        badgeTextElement.textContent = 'Congratulations! You\'ve earned another badge!';
+        badgeImageElement.src = 'images/second_badge.png';
+
+        // Show the modal
+        modal.style.display = 'block';
+
+        // Close the modal when the close button is clicked
+        const closeButton = document.getElementsByClassName('close')[0];
+        closeButton.onclick = function () {
+            modal.style.display = 'none';
+        };
+
+        // Close the modal when user clicks outside of it
+        window.onclick = function (event) {
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        };
+    }
+
+
+</script>
+</body>
+</html>
+
